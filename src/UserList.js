@@ -4,14 +4,22 @@ import "../src/css/userlist.css";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { Link, useNavigate } from "react-router-dom";
 import { useStateValue } from "./StateProvider";
-import { addDoc, collection, doc, onSnapshot, setDoc } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  doc,
+  onSnapshot,
+  setDoc,
+} from "firebase/firestore";
 import db from "./FirebaseConfig";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const UserList = () => {
   const [{ user }, dispatch] = useStateValue();
   const [userList, setUserList] = useState([]);
-
+  const error = () => toast("Wow so easy!");
   useEffect(() => {
     const docRef = collection(db, "usersData");
     onSnapshot(docRef, (snapshot) => {
@@ -20,16 +28,16 @@ const UserList = () => {
   }, []);
   const navigate = useNavigate();
 
-  const handleDoc = async (frd) => {
-    const iid = frd.uid > user.uid ? `${user.uid}${frd.uid}` : `${frd.uid}${user.uid}`;
-    await setDoc(doc(db , "usersChats", iid) , {
-      chatUsers : [user.uid , frd.uid].sort((a ,b) => a - b )
-    })
-  }
-
+  // const handleDoc = async (frd) => {
+  //   const iid = frd.uid > user.uid ? `${user.uid}${frd.uid}` : `${frd.uid}${user.uid}`;
+  //   await setDoc(doc(db , "usersChats", iid) , {
+  //     chatUsers : [user.uid , frd.uid].sort((a ,b) => a - b )
+  //   })
+  // }
 
   return (
     <div className="userlist">
+      <ToastContainer position="bottom-right" />
       <div className="userlist-navbar">
         <div className="userlist-header">
           <Link to="/">
@@ -43,7 +51,7 @@ const UserList = () => {
           <Avatar src={`${user.photoURL}`} />
         </div>
       </div>
-      <div className="userlist-container" >
+      <div className="userlist-container">
         <table className="tg">
           <thead>
             <tr>
@@ -55,21 +63,31 @@ const UserList = () => {
           <tbody>
             {userList.map((frd) => {
               return (
-                <tr key={
-                  uuidv4()
-                }>
+                <tr key={uuidv4()}>
                   <td className="tg-buh4">
                     <Avatar src={frd.photo} />
                   </td>
                   <td className="tg-797t">{frd.name}</td>
                   <td className="tg-buh4">
                     {
-                     
-                      <Button variant="contained" onClick={() => {
-                        navigate('/');
-                        navigate(`/chats/${frd.uid}` , {replace:true})
-                        handleDoc(frd);
-                      }}>
+                      <Button
+                        variant="contained"
+                        onClick={() => {
+                          toast.error("Under Development", {
+                            position: "bottom-right",
+                            autoClose: 5000,
+                            hideProgressBar: false,
+                            closeOnClick: true,
+                            pauseOnHover: true,
+                            draggable: true,
+                            progress: undefined,
+                            theme: "light",
+                          });
+                          // navigate('/');
+                          // navigate(`/chats/${frd.uid}` , {replace:true})
+                          // handleDoc(frd);
+                        }}
+                      >
                         Send Message
                       </Button>
                     }
@@ -85,4 +103,3 @@ const UserList = () => {
 };
 
 export default UserList;
-
